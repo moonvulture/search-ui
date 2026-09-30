@@ -1,0 +1,17 @@
+services:
+  es-search:
+    image: es-search:latest
+    build: .
+    container_name: es-search
+    restart: unless-stopped
+    # ES_URL, ES_API_KEY, ES_INDEX (and optionally TRUST_PROXY) come from this file
+    env_file: server/.env
+    # Only reachable from the host itself; nginx / the F5 path fronts it
+    ports:
+      - "127.0.0.1:3001:3001"
+    # Internal CA for an on-prem Elasticsearch: put the PEM next to this file
+    # and uncomment both lines below.
+    # volumes:
+    #   - ./ca.pem:/etc/ssl/certs/internal-ca.pem:ro
+    # environment:
+    #   NODE_EXTRA_CA_CERTS: /etc/ssl/certs/internal-ca.pem

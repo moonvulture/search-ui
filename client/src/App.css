@@ -1,0 +1,258 @@
+/* ---------- Theme colors ----------
+   Light values on :root, dark values under [data-theme="dark"].
+   Everything below uses these variables, so a theme is just a set of colors. */
+:root {
+  --bg: #fcfcfc;
+  --surface: #ffffff;
+  --surface-hover: #f5f7fa;
+  --border: #e3e8ee;
+  --text: #1a1c21;
+  --text-muted: #69707d;
+  --text-strong: #343741;
+  --accent: #3a56e4;
+
+  --badge-bg: #e9edf3;          --badge-fg: #343741;
+  --alert-bg: #fde8e6;          --alert-fg: #a1281c;
+  --advisory-bg: #fff3d6;       --advisory-fg: #8a5a00;
+  --info-bg: #e3f0fb;           --info-fg: #0b5cad;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #111318;
+  --surface: #1b1e25;
+  --surface-hover: #242833;
+  --border: #2e333d;
+  --text: #e6e8ec;
+  --text-muted: #9aa1ad;
+  --text-strong: #f2f3f5;
+  --accent: #7d95ff;
+
+  --badge-bg: #2a2f3a;          --badge-fg: #d5d9e0;
+  --alert-bg: #4a1d19;          --alert-fg: #ff9d91;
+  --advisory-bg: #45350f;       --advisory-fg: #ffd27a;
+  --info-bg: #13324f;           --info-fg: #8cc4ff;
+  color-scheme: dark;
+}
+
+html, body { background: var(--bg); color: var(--text); margin: 0; }
+
+/* ---------- Header: search box + theme toggle ---------- */
+.header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+.header-row > form { flex: 1; }
+.header-row .sui-search-box__text-input { font-size: 16px; }
+
+/* Toggle switch: a pill-shaped track with a sliding knob */
+.theme-switch {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.theme-switch__track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 11px;
+  background: #c4cad4;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.theme-switch__track[aria-checked="true"] { background: var(--accent); }
+.theme-switch__track:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.theme-switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+.theme-switch__track[aria-checked="true"] .theme-switch__thumb { transform: translateX(18px); }
+
+/* ---------- Result cards ---------- */
+.msg {
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.msg-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--text);
+}
+.msg-link { 
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+.msg-link:hover {
+  text-decoration: underline;
+}
+.country {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.badge {
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+}
+.badge-alert    { background: var(--alert-bg);    color: var(--alert-fg); }
+.badge-advisory { background: var(--advisory-bg); color: var(--advisory-fg); }
+.badge-info     { background: var(--info-bg);     color: var(--info-fg); }
+
+/* ---------- Custom date range ---------- */
+.date-range {
+  border: none;
+  padding: 0;
+  margin: 32px 0 0;
+}
+.date-range legend { padding: 0; margin-bottom: 8px; }
+.date-range label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+.date-range input[type="date"] {
+  flex: 1;
+  max-width: 160px;
+  padding: 5px 8px;
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.date-range__actions { display: flex; gap: 8px; margin-top: 4px; }
+.date-range__actions button {
+  padding: 6px 14px;
+  font: inherit;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.date-range__actions button:disabled { opacity: 0.45; cursor: not-allowed; }
+.date-range__actions .date-range__clear {
+  background: transparent;
+  color: var(--accent);
+}
+.date-range__error { margin: 0 0 8px; font-size: 12px; color: var(--alert-fg); }
+
+/* ---------- Search UI overrides ----------
+   Search UI's stylesheet is light-only with hard-coded colors,
+   so these point its pieces at our variables. */
+.sui-layout-header { background: var(--surface); border-bottom-color: var(--border); }
+.sui-layout-body,
+.sui-layout-sidebar { background: var(--bg); }
+.sui-layout-body:after { background: linear-gradient(to bottom, var(--bg) 0%, var(--bg) 100%); }
+
+.sui-search-box__text-input {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+.sui-search-box__text-input::placeholder { color: var(--text-muted); }
+
+.sui-facet__title,
+.sui-sorting__label,
+.sui-results-per-page__label { color: var(--text-muted); }
+
+.sui-multi-checkbox-facet,
+.sui-boolean-facet,
+.sui-single-option-facet__link,
+.sui-layout-main-header__inner,
+.sui-paging-info { color: var(--text); }
+
+.sui-multi-checkbox-facet__option-count,
+.sui-facet__count,
+.sui-single-option-facet__remove { color: var(--text-muted); }
+
+.sui-facet-view-more { color: var(--accent); }
+.sui-facet-view-more:hover,
+.sui-facet-view-more:focus { background-color: var(--surface-hover); outline-color: var(--surface-hover); }
+
+.sui-facet-search__text-input {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Dropdowns (sort, results per page) */
+.sui-select__control {
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+.sui-select__value-container--has-value,
+.sui-select__placeholder,
+.sui-select__single-value,
+.sui-select__option-label,
+.sui-select__option--is-selected .sui-search-select__option-label { color: var(--text); }
+.sui-select__menu { background: var(--surface); }
+.sui-select__option { background: var(--surface); color: var(--text); }
+.sui-select__option--is-selected { background: var(--surface-hover); color: var(--text); }
+.sui-select__option:hover,
+.sui-select__option--is-focused { background: var(--surface-hover); }
+
+/* Autocomplete */
+.sui-search-box__autocomplete-container { background: var(--surface); border-color: var(--border); }
+.sui-search-box__section-title { color: var(--text-muted); }
+.sui-search-box__autocomplete-container li { color: var(--text); }
+.sui-search-box__autocomplete-container li em { color: var(--accent); background: transparent; font-weight: 700; }
+.sui-search-box__autocomplete-container li:hover,
+.sui-search-box__autocomplete-container li[aria-selected="true"] { background: var(--accent); color: #fff; }
+
+/* Paging */
+.sui-paging .rc-pagination-item,
+.sui-paging .rc-pagination-item-active { background: transparent; border-color: var(--border); }
+.sui-paging .rc-pagination-item a,
+.sui-paging .rc-pagination-item-active a,
+.sui-paging .rc-pagination-item-active:hover a,
+.sui-paging .rc-pagination-prev > button,
+.sui-paging .rc-pagination-next > button { color: var(--text); }
+.sui-paging .rc-pagination-item-active { border-color: var(--accent); }
+.sui-paging .rc-pagination-prev > button:hover,
+.sui-paging .rc-pagination-next > button:hover { background: var(--surface-hover); color: var(--text); }
+.sui-paging .rc-pagination-disabled > button,
+.sui-paging .rc-pagination-disabled .rc-pagination-item-link { background: transparent; color: var(--text-muted); }
