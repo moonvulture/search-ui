@@ -1,0 +1,34 @@
+# --- Connection ---
+# Elasticsearch endpoint
+ES_URL=https://your-elasticsearch:9200
+# Encoded API key (read-only on the index)
+ES_API_KEY=your-encoded-api-key
+ES_INDEX=messages
+
+# --- Field names in your index ---
+# Only set the ones that differ from these defaults.
+# "country.keyword" style names work; the card shows the base field.
+# Nested fields like "geo.country" work too.
+FIELD_MESSAGE=message
+FIELD_SEMANTIC=message_semantic
+FIELD_DATE=pubDate
+FIELD_CLASSIFICATION=classification
+FIELD_COUNTRY=country
+# Leave empty to hide links
+FIELD_LINK=link
+# Card fields: classification is the coloured badge, country is shown next to it.
+# Sidebar filters, in order: field:Label, add :search for a filter box.
+# Facet fields must be keyword fields ("name.keyword" works).
+# Leave unset to get classification and country.
+# FACETS=classification:Classification,country:Country:search,source:Source
+# The details pane shows every field of a message. List any that must stay hidden.
+# HIDDEN_FIELDS=internal_notes,source_ip
+
+# --- Proxy / server ---
+# Number of proxies in front: nginx = 1, F5 + nginx = 2
+TRUST_PROXY=1
+PORT=3001
+
+# --- Internal CA ---
+# Prefer trusting your CA over disabling validation:
+# mount the PEM and set NODE_EXTRA_CA_CERTS (see compose.yaml / Quadlet file).
