@@ -49,6 +49,7 @@ function buildConfig(f) {
       search_fields: { [f.message]: {} },
       result_fields: {
         ...show(f.message),
+        ...show(f.summary),
         ...show(f.date),
         ...show(f.classification),
         ...show(f.country),
@@ -126,11 +127,11 @@ function MessageResult({ result }) {
         onClick={() => setSelectedId(id)}
       >
         <span className="msg-meta">
-          {cls && <span className={`badge badge-${cls}`}>{cls}</span>}
+          {cls && <span className={`badge badge--${f.badgeColors[String(cls).toLowerCase()] || "gray"}`}>{cls}</span>}
           {country && <span className="country">{country}</span>}
           <time>{fmtDate(getField(result, displayField(f.date)))}</time>
         </span>
-        <span className="msg-text">{getField(result, displayField(f.message))}</span>
+        <span className="msg-text">{getField(result, displayField(f.summary))}</span>
       </button>
     </li>
   );
@@ -195,7 +196,7 @@ function MessageDetails() {
         <button type="button" className="details-close" onClick={() => setSelectedId(null)}>Close</button>
       </header>
       <dl className="details-attrs">
-        <div><dt>id</dt><dd>{result.id?.raw}</dd></div>
+        {f.showId && <div><dt>id</dt><dd>{result.id?.raw}</dd></div>}
         {rows.map(([name, value]) => (
           <div key={name}><dt>{name}</dt><dd>{renderValue(name, value)}</dd></div>
         ))}
