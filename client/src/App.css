@@ -12,9 +12,12 @@
   --accent: #3a56e4;
 
   --badge-bg: #e9edf3;          --badge-fg: #343741;
-  --alert-bg: #fde8e6;          --alert-fg: #a1281c;
-  --advisory-bg: #fff3d6;       --advisory-fg: #8a5a00;
-  --info-bg: #e3f0fb;           --info-fg: #0b5cad;
+  /* Badge colours, picked per value with BADGE_COLORS in .env */
+  --red-bg: #fde8e6;            --red-fg: #a1281c;
+  --amber-bg: #fff3d6;          --amber-fg: #8a5a00;
+  --blue-bg: #e3f0fb;           --blue-fg: #0b5cad;
+  --green-bg: #e2f4e6;          --green-fg: #1e6b34;
+  --purple-bg: #efe6fb;         --purple-fg: #6a3aa8;
   color-scheme: light;
 }
 
@@ -29,9 +32,11 @@
   --accent: #7d95ff;
 
   --badge-bg: #2a2f3a;          --badge-fg: #d5d9e0;
-  --alert-bg: #4a1d19;          --alert-fg: #ff9d91;
-  --advisory-bg: #45350f;       --advisory-fg: #ffd27a;
-  --info-bg: #13324f;           --info-fg: #8cc4ff;
+  --red-bg: #4a1d19;            --red-fg: #ff9d91;
+  --amber-bg: #45350f;          --amber-fg: #ffd27a;
+  --blue-bg: #13324f;           --blue-fg: #8cc4ff;
+  --green-bg: #173a22;          --green-fg: #8fdca4;
+  --purple-bg: #33204d;         --purple-fg: #c9a9f5;
   color-scheme: dark;
 }
 
@@ -140,9 +145,12 @@ html, body { background: var(--bg); color: var(--text); margin: 0; }
   background: var(--badge-bg);
   color: var(--badge-fg);
 }
-.badge-alert    { background: var(--alert-bg);    color: var(--alert-fg); }
-.badge-advisory { background: var(--advisory-bg); color: var(--advisory-fg); }
-.badge-info     { background: var(--info-bg);     color: var(--info-fg); }
+.badge--red    { background: var(--red-bg);    color: var(--red-fg); }
+.badge--amber  { background: var(--amber-bg);  color: var(--amber-fg); }
+.badge--blue   { background: var(--blue-bg);   color: var(--blue-fg); }
+.badge--green  { background: var(--green-bg);  color: var(--green-fg); }
+.badge--purple { background: var(--purple-bg); color: var(--purple-fg); }
+/* "gray" and unlisted values use the plain .badge colours */
 
 /* ---------- Custom date range ---------- */
 .date-range {
@@ -186,7 +194,7 @@ html, body { background: var(--bg); color: var(--text); margin: 0; }
   background: transparent;
   color: var(--accent);
 }
-.date-range__error { margin: 0 0 8px; font-size: 12px; color: var(--alert-fg); }
+.date-range__error { margin: 0 0 8px; font-size: 12px; color: var(--red-fg); }
 
 /* ---------- Search UI overrides ----------
    Search UI's stylesheet is light-only with hard-coded colors,
@@ -277,8 +285,6 @@ html, body { background: var(--bg); color: var(--text); margin: 0; }
 
 /* Loading / error message before the search UI starts */
 .app-status { padding: 40px; text-align: center; color: var(--text-muted); font-size: 14px; }
-
-/* "Read more" link on result cards */
 
 /* ---------- Three panes: filters | message feed | message details ---------- */
 .sui-layout-header__inner, .sui-layout-body__inner { max-width: 1680px; }
