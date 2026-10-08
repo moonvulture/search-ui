@@ -16,13 +16,20 @@ FIELD_CLASSIFICATION=classification
 FIELD_COUNTRY=country
 # Leave empty to hide links
 FIELD_LINK=link
+# What the feed cards show (e.g. title). Defaults to FIELD_MESSAGE.
+# The details pane always shows FIELD_MESSAGE in full.
+# FIELD_SUMMARY=title
 # Card fields: classification is the coloured badge, country is shown next to it.
+# Badge colours per value: red, amber, blue, green, purple, gray. Case is ignored;
+# unlisted values are gray.
+# BADGE_COLORS=alert:red,advisory:amber,info:blue
 # Sidebar filters, in order: field:Label, add :search for a filter box.
 # Facet fields must be keyword fields ("name.keyword" works).
 # Leave unset to get classification and country.
 # FACETS=classification:Classification,country:Country:search,source:Source
 # The details pane shows every field of a message. List any that must stay hidden.
-# HIDDEN_FIELDS=internal_notes,source_ip
+# Add _id to hide the document id row.
+# HIDDEN_FIELDS=internal_notes,source_ip,_id
 
 # --- Proxy / server ---
 # Number of proxies in front: nginx = 1, F5 + nginx = 2
