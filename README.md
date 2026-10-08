@@ -87,14 +87,16 @@ The server reads `server/.env` in development, or the file passed to the contain
 
 | Variable | Default | Used for |
 |---|---|---|
-| `FIELD_MESSAGE` | `message` | Text field: keyword search, autocomplete, card summary, full text |
+| `FIELD_MESSAGE` | `message` | Text field: keyword search, autocomplete, full text in the details pane |
+| `FIELD_SUMMARY` | same as `FIELD_MESSAGE` | What the feed cards show, e.g. `title` |
 | `FIELD_SEMANTIC` | `message_semantic` | `semantic_text` field: meaning-based search. Never sent to the browser |
 | `FIELD_DATE` | `pubDate` | Date field: Published presets, date range, sorting, card date |
-| `FIELD_CLASSIFICATION` | `classification` | Coloured badge on cards (`alert`, `advisory`, `info` have colours) |
+| `FIELD_CLASSIFICATION` | `classification` | Coloured badge on cards; colours come from `BADGE_COLORS` |
 | `FIELD_COUNTRY` | `country` | Text shown next to the badge on cards |
 | `FIELD_LINK` | `link` | URL field, shown as a clickable link in the details pane. Empty to disable |
 | `FACETS` | classification and country | Sidebar filters, see below |
-| `HIDDEN_FIELDS` | *(none)* | Comma-separated fields never sent to the browser |
+| `BADGE_COLORS` | `alert:red,advisory:amber,info:blue` | Badge colour per value, see below |
+| `HIDDEN_FIELDS` | *(none)* | Comma-separated fields never sent to the browser. Add `_id` to hide the id row |
 
 Notes on field names:
 - `name.keyword` style names work. Cards and details show the base field (`name`).
@@ -111,6 +113,19 @@ FACETS=classification:Classification,country:Country:search,source:Source
 - Add `:search` for a filter box inside the facet, handy for long lists.
 - Several values can be ticked at once (OR), and the counts for the other values stay visible.
 - Leave `FACETS` unset to get classification and country.
+
+**Badge colours**
+
+```
+BADGE_COLORS=secret:red,confidential:amber,restricted:purple,unclassified:green
+```
+
+- Each entry is `value:colour`. Colours: `red`, `amber`, `blue`, `green`, `purple`, `gray`.
+- Matching ignores case, so `secret` also colours `SECRET`.
+- Values not listed are gray.
+- The colours themselves (light and dark versions) are CSS variables at the top of `client/src/App.css` (`--red-bg`, `--red-fg`, …). Change them there if you want different shades.
+
+**Hiding the document id:** `_id` is not part of the document body, so it can't be removed from the search response; the app needs it to tell messages apart. Listing `_id` (or `id`) in `HIDDEN_FIELDS` hides the id row in the details pane.
 
 **Server and proxy**
 
@@ -131,7 +146,9 @@ Prefer `NODE_EXTRA_CA_CERTS` over `NODE_TLS_REJECT_UNAUTHORIZED=0`. The latter t
 |---|---|
 | Add a **sidebar filter** | `.env` only: add `field:Label` to the `FACETS` line |
 | Show a field in the **details pane** | Nothing. Every field in the document already shows there automatically |
-| Hide a field from the details pane | `.env` only: `HIDDEN_FIELDS` |
+| Hide a field from the details pane | `.env` only: `HIDDEN_FIELDS` (`_id` hides the id row) |
+| Show a different field on the **feed cards** (e.g. title instead of message) | `.env` only: `FIELD_SUMMARY` |
+| Colour a **badge value** | `.env` only: `BADGE_COLORS` |
 | Point an existing role at a different field name (message, date, badge, country, link, semantic) | `.env` only: the matching `FIELD_*` line |
 | Give a field a **new job**, like a second label on the feed cards or a new kind of filter | Code: `server/index.js` *and* `client/src/App.jsx` |
 
@@ -229,7 +246,8 @@ ARG NODE_IMAGE=node:22-alpine
 FROM ${NODE_IMAGE} AS client-build
 ARG NPM_REGISTRY
 ...
-RUN if [ -n "$NPM_REGISTRY" ]; then npm config set registry "$NPM_REGISTRY"; fi && npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    if [ -n "$NPM_REGISTRY" ]; then npm config set registry "$NPM_REGISTRY"; fi && npm ci
 ```
 
 **With internet access (Docker):**
@@ -252,6 +270,10 @@ sudo podman build --format docker \
 - `--format docker` keeps the `HEALTHCHECK`; Podman's default format drops it.
 - `sudo` puts the image in root's image store, where the systemd service looks for it.
 - `package-lock.json` points at `registry.npmjs.org`; npm swaps in `NPM_REGISTRY` automatically.
+
+**Build speed.** The Dockerfile copies `package.json` and `package-lock.json` and runs `npm ci` *before* copying the source. A change to `App.jsx` or `index.js` reuses the cached install, so only the client build and the final layers run; the build log shows those steps as `CACHED` / `Using cache`. `npm ci` runs again only when a `package*.json` file or a build argument changes, and then the npm cache mount (`--mount=type=cache,target=/root/.npm`) avoids downloading packages that are already cached.
+
+If every build reinstalls everything, check that you're not passing `--no-cache`, that you always build with the same `sudo` (root and your user have separate caches), that the `--build-arg` values are identical each time, and that `BUILDAH_LAYERS` isn't set to `false`.
 
 Check an image before shipping it:
 
@@ -386,5 +408,7 @@ sudo nginx -t && sudo systemctl enable --now nginx
 | A facet is empty | Field isn't `keyword`, or wrong name | Use the `.keyword` sub-field; check `curl -s localhost:3001/api/config` |
 | A field shows the wrong value on cards | `FIELD_*` points at the wrong field | Fix `.env`, restart |
 | Users get "Too many requests" | Everyone shares one IP for rate limiting | F5 X-Forwarded-For insertion plus `TRUST_PROXY=2` |
+| Every build reinstalls npm packages | Cache not reused | See *Build speed* above |
+| A badge value has no colour | Not in `BADGE_COLORS`, or misspelled | Add `value:colour`; case doesn't matter |
 | Image builds but has no health status | Built in OCI format | Rebuild with `podman build --format docker` |
 | Service can't find the image | Image loaded without `sudo` | `sudo podman load` / `sudo podman build`; root and users have separate image stores |
