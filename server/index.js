@@ -17,12 +17,26 @@ const {
   FIELD_MESSAGE = "message", // text field: keyword search, autocomplete, display
   FIELD_SEMANTIC = "message_semantic", // semantic_text field: meaning-based search
   FIELD_DATE = "pubDate", // date field: Published facet, date range, sorting
-  FIELD_CLASSIFICATION = "classification", // keyword field: facet + badge
-  FIELD_COUNTRY = "country", // keyword field: facet
+  FIELD_SUMMARY, // what the feed cards show; defaults to FIELD_MESSAGE
+  FIELD_CLASSIFICATION = "classification", // coloured badge on cards
+  FIELD_COUNTRY = "country", // text next to the badge on cards
   FIELD_LINK = "link", // optional URL field ("" to disable)
   HIDDEN_FIELDS = "", // comma-separated fields never sent to the browser
   FACETS, // sidebar filters, e.g. "classification:Classification,country:Country:search"
+  BADGE_COLORS = "alert:red,advisory:amber,info:blue", // badge value:colour pairs
 } = process.env;
+
+const HIDDEN = HIDDEN_FIELDS.split(",").map((x) => x.trim()).filter(Boolean);
+
+// BADGE_COLORS maps badge values to colours: red, amber, blue, green, purple, gray.
+// Matching ignores case. Unlisted values are gray.
+const COLORS = new Set(["red", "amber", "blue", "green", "purple", "gray"]);
+const BADGE_COLOR_MAP = Object.fromEntries(
+  BADGE_COLORS.split(",")
+    .map((pair) => pair.split(":").map((x) => x.trim()))
+    .filter(([value, color]) => value && COLORS.has((color || "").toLowerCase()))
+    .map(([value, color]) => [value.toLowerCase(), color.toLowerCase()])
+);
 
 // FACETS is a comma-separated list of field:Label[:search] entries, shown in that order.
 // ":search" adds a filter box inside the facet (useful for long lists).
@@ -44,6 +58,7 @@ const FACET_LIST = parseFacets(
 
 const FIELDS = {
   message: FIELD_MESSAGE,
+  summary: FIELD_SUMMARY || FIELD_MESSAGE,
   date: FIELD_DATE,
   classification: FIELD_CLASSIFICATION,
   country: FIELD_COUNTRY,
@@ -72,10 +87,7 @@ function buildQuery(state) {
 
 // The details pane lists every attribute of a message, so return the whole document
 // except the embeddings field and anything listed in HIDDEN_FIELDS.
-const SOURCE_EXCLUDES = [
-  FIELD_SEMANTIC,
-  ...HIDDEN_FIELDS.split(",").map((x) => x.trim()).filter(Boolean),
-];
+const SOURCE_EXCLUDES = [FIELD_SEMANTIC, ...HIDDEN];
 
 const connector = new ElasticsearchAPIConnector({
   host: ES_URL,
@@ -93,7 +105,17 @@ app.use("/api/search", rateLimit({ windowMs: 60_000, limit: 30 }));
 app.use("/api/autocomplete", rateLimit({ windowMs: 60_000, limit: 120 }));
 
 // Field names for the browser, so the same built client works against any index layout.
-app.get("/api/config", (_req, res) => res.json({ fields: { ...FIELDS, facets: FACET_LIST } }));
+app.get("/api/config", (_req, res) =>
+  res.json({
+    fields: {
+      ...FIELDS,
+      facets: FACET_LIST,
+      badgeColors: BADGE_COLOR_MAP,
+      // The document id isn't part of the document body, so hide it here instead
+      showId: !HIDDEN.includes("_id") && !HIDDEN.includes("id"),
+    },
+  })
+);
 
 app.post("/api/search", async (req, res) => {
   try {
